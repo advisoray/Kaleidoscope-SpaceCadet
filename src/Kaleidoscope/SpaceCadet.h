@@ -1,38 +1,35 @@
 /* -*- mode: c++ -*-
  * Kaleidoscope-SpaceCadet -- Space Cadet Shift Extended
- * Copyright (C) 2016, 2017  Gergely Nagy, Ben Gemperline
+ * Copyright (C) 2016, 2017, 2018  Keyboard.io, Inc, Ben Gemperline
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, version 3.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
 
 #include <Kaleidoscope.h>
+#include <Kaleidoscope-Ranges.h>
 
 #ifndef SPACECADET_MAP_END
 #define SPACECADET_MAP_END (kaleidoscope::SpaceCadet::KeyBinding) { Key_NoKey, Key_NoKey, 0 }
 #endif
 
-#ifndef SPACECADET_TOGGLE
-#define SPACECADET_TOGGLE B00000011  // Synthetic, internal
-#define Key_SpaceCadetEnable (Key) { 0,  KEY_FLAGS | SYNTHETIC | IS_INTERNAL | SPACECADET_TOGGLE }
-#define Key_SpaceCadetDisable (Key) { 1,  KEY_FLAGS | SYNTHETIC | IS_INTERNAL | SPACECADET_TOGGLE }
-#endif
+#define Key_SpaceCadetEnable (Key) { .raw = kaleidoscope::ranges::SC_FIRST }
+#define Key_SpaceCadetDisable (Key) { .raw = kaleidoscope::ranges::SC_LAST }
 
 namespace kaleidoscope {
-//Declaration for the method (implementing KaleidoscopePlugin)
-class SpaceCadet : public KaleidoscopePlugin {
+
+class SpaceCadet : public kaleidoscope::Plugin {
  public:
   //Internal Class
   //Declarations for the modifier key mapping
@@ -56,11 +53,9 @@ class SpaceCadet : public KaleidoscopePlugin {
     uint32_t start_time = 0;
   };
 
-  //Empty constructor
   SpaceCadet(void);
 
   //Methods
-  void begin(void) final;
   static void enable(void);
   static void disable(void);
   static bool active(void);
@@ -69,8 +64,9 @@ class SpaceCadet : public KaleidoscopePlugin {
   static uint16_t time_out;  //  The global timeout in milliseconds
   static SpaceCadet::KeyBinding * map;  // The map of key bindings
 
+  EventHandlerResult onKeyswitchEvent(Key &mapped_key, byte row, byte col, uint8_t key_state);
+
  private:
-  static Key eventHandlerHook(Key mapped_key, byte row, byte col, uint8_t key_state);
   static bool disabled;
 };
 };
